@@ -2,6 +2,7 @@ import unittest
 from hashDictionary import HashMap, MonoidHashMap
 from hypothesis import given, strategies as st
 
+
 class TestHashMap(unittest.TestCase):
 
     def test_add_and_get(self):
@@ -45,6 +46,7 @@ class TestHashMap(unittest.TestCase):
         hashmap.add('key3', 'value3')
         self.assertEqual(hashmap.to_builtin_list()[-1], ('key3', 'value3'))
 
+
 class TestMonoidHashMap(unittest.TestCase):
 
     def test_empty(self):
@@ -57,13 +59,14 @@ class TestMonoidHashMap(unittest.TestCase):
         hashmap1.add('key1', 'value1')
         hashmap2.add('key1', 'value2')  # 相同键不同值
         hashmap2.add('key2', 'value3')
-        
+
         concated_hashmap = hashmap1.concat(hashmap2)
         # 测试键覆盖
         self.assertEqual(concated_hashmap.get('key1'), 'value2')  # 后者覆盖前者
         self.assertEqual(concated_hashmap.get('key2'), 'value3')
         # 测试顺序：后合并的键应在末尾
-        self.assertEqual(concated_hashmap.to_builtin_list()[-1], ('key2', 'value3'))
+        self.assertEqual(concated_hashmap.to_builtin_list()[-1],
+                         ('key2', 'value3'))
 
     def test_map_by_function(self):
         hashmap = MonoidHashMap()
@@ -83,14 +86,19 @@ class TestMonoidHashMap(unittest.TestCase):
         self.assertEqual(result, 3)
         # 测试空Map
         empty_map = MonoidHashMap.empty()
-        self.assertEqual(empty_map.reduce_process_elements(lambda x,y: x+y, initial=0), 0)
+        self.assertEqual(empty_map.reduce_process_elements(
+            lambda x, y: x+y, initial=0), 0)
+
 
 class TestMonoidHashMapPBT(unittest.TestCase):
 
     @given(
-        st.lists(st.tuples(st.text(), st.integers()), unique_by=lambda x: x[0]),  # 确保键唯一
-        st.lists(st.tuples(st.text(), st.integers()), unique_by=lambda x: x[0]),
-        st.lists(st.tuples(st.text(), st.integers()), unique_by=lambda x: x[0])
+        st.lists(st.tuples(st.text(), st.integers()),
+                 unique_by=lambda x: x[0]),  # 确保键唯一
+        st.lists(st.tuples(st.text(), st.integers()),
+                 unique_by=lambda x: x[0]),
+        st.lists(st.tuples(st.text(), st.integers()),
+                 unique_by=lambda x: x[0])
     )
     def test_monoid_associativity(self, lst1, lst2, lst3):
         hashmap1 = MonoidHashMap()
@@ -102,7 +110,7 @@ class TestMonoidHashMapPBT(unittest.TestCase):
 
         left = hashmap1.concat(hashmap2).concat(hashmap3)
         right = hashmap1.concat(hashmap2.concat(hashmap3))
-        
+
         # 转换为字典比较，因为列表顺序可能不同但内容应相同
         self.assertEqual(
             dict(left.to_builtin_list()),
@@ -114,7 +122,7 @@ class TestMonoidHashMapPBT(unittest.TestCase):
         hashmap = MonoidHashMap()
         hashmap.from_builtin_list(lst)
         empty_map = MonoidHashMap.empty()
-        
+
         # 合并空Map应不影响原数据
         self.assertEqual(
             dict(hashmap.concat(empty_map).to_builtin_list()),
@@ -124,6 +132,7 @@ class TestMonoidHashMapPBT(unittest.TestCase):
             dict(empty_map.concat(hashmap).to_builtin_list()),
             dict(hashmap.to_builtin_list())
         )
+
 
 if __name__ == '__main__':
     unittest.main()

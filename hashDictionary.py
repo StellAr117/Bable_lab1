@@ -1,114 +1,141 @@
-class HashMap:
-    def __init__(self):
-        self.bucket_size = 10
-        self.buckets = [None] * self.bucket_size
-        self.keys_order = []  # Maintains insertion order of unique keys
-
-    def _hash_function(self, key):
-        # Compute bucket index for a given key using hash modulo.
-        return hash(key) % self.bucket_size
-
-    def add(self, key, value):
-        # Insert or update a key-value pair while preserving insertion order.
-        index = self._hash_function(key)
-        if self.buckets[index] is None:
-            self.buckets[index] = []
-        #  Check if key exists in bucket
-        for i, (existing_key, _) in enumerate(self.buckets[index]):
-            if existing_key == key:
-                #  Update existing value without changing insertion order
-                self.buckets[index][i] = (key, value)
-                return        
-        #  Add new key-value pair
-        self.buckets[index].append((key, value))
-        #  Track insertion order for new keys
-        if key not in self.keys_order:
-            self.keys_order.append(key)
-        else:
-            pass
-
-    def set_element(self, key, value):
-        #  Alias for add() to match dictionary-like API.
-        self.add(key, value)
-
-    def get(self, key):
-        # Retrieve value for a key, returns None if not found.
-        index = self._hash_function(key)
-        if self.buckets[index] is not None:
-            for existing_key, value in self.buckets[index]:
-                if existing_key == key:
-                    return value
-        return None
-
-    def remove(self, key):
-        # Delete a key-value pair and its insertion order tracking.
-        index = self._hash_function(key)
-        if self.buckets[index] is not None:
-            for i, (existing_key, _) in enumerate(self.buckets[index]):
-                if existing_key == key:
-                    del self.buckets[index][i]
-                    if key in self.keys_order:
-                        self.keys_order.remove(key)
-                    return
-
-    def size(self):
-        # Return count of unique keys using insertion order tracking.
-        return len(self.keys_order)
-
-    def is_member(self, key):
-        # Check if key exists using efficient order tracking.
-        return key in self.keys_order
-
-    def from_builtin_list(self, lst):
-        # Populate from Python list of (key, value) tuples.
-        for key, value in lst:
-            self.add(key, value)
-
-    def to_builtin_list(self):
-        # Convert to Python list preserving insertion order.
-        return [(key, self.get(key)) for key in self.keys_order 
-                if self.get(key) is not None]
-
-    def filter_by_predicate(self, predicate):
-        # Create new map containing entries that satisfy predicate(key, value).
-        filtered_map = self.__class__()
-        for key in self.keys_order:
-            value = self.get(key)
-            if value is not None and predicate(key, value):
-                filtered_map.add(key, value)
-        return filtered_map
+import unittest
+from hashDictionary import HashMap, MonoidHashMap
+from hypothesis import given, strategies as st
 
 
-class MonoidHashMap(HashMap):
-    # Monoid implementation supporting empty identity 
-    # and associative concatenation. 
-    @classmethod
-    def empty(cls):
-        # Identity element for monoid (empty map)
-        return cls()
+class TestHashMap(unittest.TestCase):
 
-    def concat(self, other):
-        # Associative operation: merge another map into this one.
-        for key in other.keys_order:
-            value = other.get(key)
-            #  Update insertion order for conflicts
-            if key in self.keys_order:
-                self.keys_order.remove(key)
-            self.keys_order.append(key)
-            self.add(key, value)
-        return self
+    def test_add_and_get(self):
+        hashmap = HashMap()
+        hashmap.add('key1', 'value1')
+        self.assertEqual(hashmap.get('key1'), 'value1')
+        # Additional: Test value overwrite for duplicate keys
+        hashmap.add('key1', 'new_value')
+        self.assertEqual(hashmap.get('key1'), 'new_value')
+        # Ensure value is updated
 
-    def map_by_function(self, func):
-        # Apply function to values and return new transformed map.
-        new_map = self.__class__()
-        for key in self.keys_order:
-            new_map.add(key, func(self.get(key)))
-        return new_map
+    def test_remove(self):
+        hashmap = HashMap()
+        hashmap.add('key1', 'value1')
+        hashmap.remove('key1')
+        self.assertEqual(hashmap.get('key1'), None)
+        # Additional: Test re-adding after removal
+        hashmap.add('key1', 'value2')
+        self.assertEqual(hashmap.get('key1'), 'value2')
 
-    def reduce_process_elements(self, func, initial=None):
-        # Reduce values using binary function, optionally with initial value.
-        result = initial
-        for key in self.keys_order:
-            value = self.get(key)
-            result = func(result, value) if result is not None else value
-        return result
+    def test_size(self):
+        hashmap = HashMap()
+        hashmap.add('key1', 'value1')
+        hashmap.add('key2', 'value2')
+        self.assertEqual(hashmap.size(), 2)
+        # Additional: Test duplicate keys don't increase size
+        hashmap.add('key1', 'value3')
+        self.assertEqual(hashmap.size(), 2)  # Size should remain 2, not 3
+
+    def test_is_member(self):
+        hashmap = HashMap()
+        hashmap.add('key1', 'value1')
+        self.assertTrue(hashmap.is_member('key1'))
+        self.assertFalse(hashmap.is_member('key2'))
+
+    def test_from_to_builtin_list(self):
+        hashmap = HashMap()
+        initial_list = [('key1', 'value1'), ('key2', 'value2')]
+        hashmap.from_builtin_list(initial_list)
+        self.assertEqual(hashmap.to_builtin_list(), initial_list)
+        # Additional: Test if list order is preserved
+        hashmap.add('key3', 'value3')
+        self.assertEqual(hashmap.to_builtin_list()[-1], ('key3', 'value3'))
+
+
+class TestMonoidHashMap(unittest.TestCase):
+
+    def test_empty(self):
+        empty_hashmap = MonoidHashMap.empty()
+        self.assertEqual(empty_hashmap.size(), 0)
+
+    def test_concat(self):
+        hashmap1 = MonoidHashMap()
+        hashmap2 = MonoidHashMap()
+        hashmap1.add('key1', 'value1')
+        hashmap2.add('key1', 'value2')  # Same key with different value
+        hashmap2.add('key2', 'value3')
+
+        concated_hashmap = hashmap1.concat(hashmap2)
+        # Test key overwriting
+        self.assertEqual(concated_hashmap.get('key1'), 'value2')
+        # Later value overwrites
+        self.assertEqual(concated_hashmap.get('key2'), 'value3')
+        # Test order: keys from latter map should be at the end
+        self.assertEqual(concated_hashmap.to_builtin_list()[-1],
+                         ('key2', 'value3'))
+
+    def test_map_by_function(self):
+        hashmap = MonoidHashMap()
+        hashmap.add('key1', 1)
+        hashmap.add('key2', 2)
+        new_map = hashmap.map_by_function(lambda x: x * 2)
+        self.assertEqual(new_map.get('key1'), 2)
+        self.assertEqual(new_map.get('key2'), 4)
+        # Test original map is not modified
+        self.assertEqual(hashmap.get('key1'), 1)
+
+    def test_reduce_process_elements(self):
+        hashmap = MonoidHashMap()
+        hashmap.add('key1', 1)
+        hashmap.add('key2', 2)
+        result = hashmap.reduce_process_elements(lambda x, y: x + y, initial=0)
+        self.assertEqual(result, 3)
+        # Test empty map
+        empty_map = MonoidHashMap.empty()
+        self.assertEqual(empty_map.reduce_process_elements(
+            lambda x, y: x+y, initial=0), 0)
+
+
+class TestMonoidHashMapPBT(unittest.TestCase):
+
+    @given(
+        st.lists(st.tuples(st.text(), st.integers()),
+                 unique_by=lambda x: x[0]),  # Ensure keys are unique
+        st.lists(st.tuples(st.text(), st.integers()),
+                 unique_by=lambda x: x[0]),
+        st.lists(st.tuples(st.text(), st.integers()),
+                 unique_by=lambda x: x[0])
+    )
+    def test_monoid_associativity(self, lst1, lst2, lst3):
+        hashmap1 = MonoidHashMap()
+        hashmap1.from_builtin_list(lst1)
+        hashmap2 = MonoidHashMap()
+        hashmap2.from_builtin_list(lst2)
+        hashmap3 = MonoidHashMap()
+        hashmap3.from_builtin_list(lst3)
+
+        left = hashmap1.concat(hashmap2).concat(hashmap3)
+        right = hashmap1.concat(hashmap2.concat(hashmap3))
+
+        # Compare as dictionaries since list order might differ
+        # but content should be same
+        self.assertEqual(
+            dict(left.to_builtin_list()),
+            dict(right.to_builtin_list())
+        )
+
+    @given(st.lists(st.tuples(st.text(), st.integers())))
+    def test_monoid_identity(self, lst):
+        hashmap = MonoidHashMap()
+        hashmap.from_builtin_list(lst)
+        empty_map = MonoidHashMap.empty()
+
+        # Concatenating with empty map shouldn't change the original
+        self.assertEqual(
+            dict(hashmap.concat(empty_map).to_builtin_list()),
+            dict(hashmap.to_builtin_list())
+        )
+        self.assertEqual(
+            dict(empty_map.concat(hashmap).to_builtin_list()),
+            dict(hashmap.to_builtin_list())
+        )
+
+
+if __name__ == '__main__':
+    unittest.main()
