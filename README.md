@@ -16,12 +16,13 @@ enough for educational purposes.
 
 ## Contribution
 
-- Aleksandr Penskoi (EMAIL) -- all work.
+- Aleksandr Penskoi (EMAIL) -- template.
+- He Jian --all work
 
 ## Changelog
 
 - 29.03.2022 - 2
-  - Add test coverage.
+  - Add  HashDictionary.py
 - 29.03.2022 - 1
   - Update README. Add formal sections.
 - 29.03.2022 - 0

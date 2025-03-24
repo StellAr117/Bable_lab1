@@ -9,16 +9,17 @@ class TestHashMap(unittest.TestCase):
         hashmap = HashMap()
         hashmap.add('key1', 'value1')
         self.assertEqual(hashmap.get('key1'), 'value1')
-        # 新增：测试重复键的值覆盖
+        # Additional: Test value overwrite for duplicate keys
         hashmap.add('key1', 'new_value')
-        self.assertEqual(hashmap.get('key1'), 'new_value')  # 确保值被更新
+        self.assertEqual(hashmap.get('key1'), 'new_value')
+        # Ensure value is updated
 
     def test_remove(self):
         hashmap = HashMap()
         hashmap.add('key1', 'value1')
         hashmap.remove('key1')
         self.assertEqual(hashmap.get('key1'), None)
-        # 新增：测试删除后重新添加
+        # Additional: Test re-adding after removal
         hashmap.add('key1', 'value2')
         self.assertEqual(hashmap.get('key1'), 'value2')
 
@@ -27,9 +28,9 @@ class TestHashMap(unittest.TestCase):
         hashmap.add('key1', 'value1')
         hashmap.add('key2', 'value2')
         self.assertEqual(hashmap.size(), 2)
-        # 新增：测试重复键不计入size
+        # Additional: Test duplicate keys don't increase size
         hashmap.add('key1', 'value3')
-        self.assertEqual(hashmap.size(), 2)  # Size应保持2，不是3
+        self.assertEqual(hashmap.size(), 2)  # Size should remain 2, not 3
 
     def test_is_member(self):
         hashmap = HashMap()
@@ -42,7 +43,7 @@ class TestHashMap(unittest.TestCase):
         initial_list = [('key1', 'value1'), ('key2', 'value2')]
         hashmap.from_builtin_list(initial_list)
         self.assertEqual(hashmap.to_builtin_list(), initial_list)
-        # 新增：测试列表顺序是否保留
+        # Additional: Test if list order is preserved
         hashmap.add('key3', 'value3')
         self.assertEqual(hashmap.to_builtin_list()[-1], ('key3', 'value3'))
 
@@ -57,14 +58,15 @@ class TestMonoidHashMap(unittest.TestCase):
         hashmap1 = MonoidHashMap()
         hashmap2 = MonoidHashMap()
         hashmap1.add('key1', 'value1')
-        hashmap2.add('key1', 'value2')  # 相同键不同值
+        hashmap2.add('key1', 'value2')  # Same key with different value
         hashmap2.add('key2', 'value3')
 
         concated_hashmap = hashmap1.concat(hashmap2)
-        # 测试键覆盖
-        self.assertEqual(concated_hashmap.get('key1'), 'value2')  # 后者覆盖前者
+        # Test key overwriting
+        self.assertEqual(concated_hashmap.get('key1'), 'value2')
+        # Later value overwrites
         self.assertEqual(concated_hashmap.get('key2'), 'value3')
-        # 测试顺序：后合并的键应在末尾
+        # Test order: keys from latter map should be at the end
         self.assertEqual(concated_hashmap.to_builtin_list()[-1],
                          ('key2', 'value3'))
 
@@ -75,7 +77,7 @@ class TestMonoidHashMap(unittest.TestCase):
         new_map = hashmap.map_by_function(lambda x: x * 2)
         self.assertEqual(new_map.get('key1'), 2)
         self.assertEqual(new_map.get('key2'), 4)
-        # 测试原Map未被修改
+        # Test original map is not modified
         self.assertEqual(hashmap.get('key1'), 1)
 
     def test_reduce_process_elements(self):
@@ -84,7 +86,7 @@ class TestMonoidHashMap(unittest.TestCase):
         hashmap.add('key2', 2)
         result = hashmap.reduce_process_elements(lambda x, y: x + y, initial=0)
         self.assertEqual(result, 3)
-        # 测试空Map
+        # Test empty map
         empty_map = MonoidHashMap.empty()
         self.assertEqual(empty_map.reduce_process_elements(
             lambda x, y: x+y, initial=0), 0)
@@ -94,7 +96,7 @@ class TestMonoidHashMapPBT(unittest.TestCase):
 
     @given(
         st.lists(st.tuples(st.text(), st.integers()),
-                 unique_by=lambda x: x[0]),  # 确保键唯一
+                 unique_by=lambda x: x[0]),  # Ensure keys are unique
         st.lists(st.tuples(st.text(), st.integers()),
                  unique_by=lambda x: x[0]),
         st.lists(st.tuples(st.text(), st.integers()),
@@ -111,7 +113,8 @@ class TestMonoidHashMapPBT(unittest.TestCase):
         left = hashmap1.concat(hashmap2).concat(hashmap3)
         right = hashmap1.concat(hashmap2.concat(hashmap3))
 
-        # 转换为字典比较，因为列表顺序可能不同但内容应相同
+        # Compare as dictionaries since list order might differ
+        # but content should be same
         self.assertEqual(
             dict(left.to_builtin_list()),
             dict(right.to_builtin_list())
@@ -123,7 +126,7 @@ class TestMonoidHashMapPBT(unittest.TestCase):
         hashmap.from_builtin_list(lst)
         empty_map = MonoidHashMap.empty()
 
-        # 合并空Map应不影响原数据
+        # Concatenating with empty map shouldn't change the original
         self.assertEqual(
             dict(hashmap.concat(empty_map).to_builtin_list()),
             dict(hashmap.to_builtin_list())
