@@ -1,6 +1,8 @@
 # BABEL - Lab 1 - Variant 7
 
-This project implements a hash map using separate chaining collision resolution and extends it with monoid operations. Designed for educational purposes to demonstrate hash table implementation and algebraic structures.
+This project implements a hash map using separate chaining collision resolution
+and extends it with monoid operations. Designed for educational purposes to
+demonstrate hash table implementation and algebraic structures.
 
 ---
 
@@ -42,7 +44,7 @@ This project implements a hash map using separate chaining collision resolution 
   ```python
   # Value transformation
   new_map = original.map_by_function(lambda x: x*2)
-  
+
   # Aggregation
   total = original.reduce_process_elements(lambda a,b: a+b)
 
@@ -61,8 +63,6 @@ This project implements a hash map using separate chaining collision resolution 
 
 ### 2025-3-22
 
-#### Added
-
 - Complete `HashDictionary` implementation  
 - Monoid operations extension  
 
@@ -72,8 +72,6 @@ This project implements a hash map using separate chaining collision resolution 
 - Improved insertion order tracking  
 
 ### 2025-3-23
-
-#### Added
 
 - Property-based testing suite  
 
@@ -89,24 +87,28 @@ This project implements a hash map using separate chaining collision resolution 
 ### Hash Table Architecture
 
 ```python
+
 class HashMap:
     def __init__(self):
         self.bucket_size = 10  # Fixed bucket count
         self.buckets = [None] * self.bucket_size
         self.keys_order = []  # Insertion order tracking
+
 ```
 
 ### Monoid Implementation
 
 ```python
+
 class MonoidHashMap(HashMap):
     @classmethod
     def empty(cls):
         """Identity element for monoid operations"""
         return cls()
-    
+
     def concat(self, other):
         """Merge operation with last-write semantics"""
         for key in other.keys_order:
             self.add(key, other.get(key))
+
 ```
