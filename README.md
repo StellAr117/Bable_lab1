@@ -11,7 +11,7 @@ demonstrate hash table implementation and algebraic structures.
 ### Code Files
 
 - `hash.py`Contains `HashMap` and `MonoidHashMap` implementations with:  
-  - Key-value operations: `add`, `get`, `remove`  
+  - Key-value operations:  `add`, `get`, `remove`  
   - Insertion order preservation (`to_builtin_list`)  
   - List serialization (`from_builtin_list`, `to_builtin_list`)  
   - Data transformations (`filter_by_predicate`, `map_by_function`)  
