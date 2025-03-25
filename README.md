@@ -33,7 +33,8 @@ demonstrate hash table implementation and algebraic structures.
 
 - **Separate Chaining**: Dynamic collision resolution using bucket lists  
 - **Key Uniqueness**: Ensures unique keys with value overwriting  
-- **Order Preservation**: Maintains insertion order for deterministic iteration  
+- **Order Preservation**: Maintains insertion order for
+                          deterministic iteration  
 
 ### Monoid Operations
 
@@ -52,10 +53,10 @@ demonstrate hash table implementation and algebraic structures.
 
 ## Contributors
 
-| Contributor          | Contact               | Contributions                    |
-|----------------------|-----------------------|----------------------------------|
-| He Jian              | <hj66216084@gmail.com>  | Core implementation & testing    |
-| Aleksandr Penskoi    | <penskoi@example.com>   | Project template design          |
+| Contributor      | Contact               | Contributions                |
+|------------------|-----------------------|------------------------------|
+| He Jian          | <hj66216084@gmail.com>| Core implementation & testing|
+| Aleksandr Penskoi| <penskoi@example.com> | Project template design      |
 
 ---
 
