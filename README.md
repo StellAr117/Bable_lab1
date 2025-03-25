@@ -164,7 +164,7 @@ class MonoidHashMap(HashMap):
 
 ### Improvements
 
-1. **Thread Safety**: Add modification locks
-2. **Resizing**: Dynamic bucket expansion
-3. **Memory**: Pooled node allocation
-4. **Metrics**: Add performance benchmarks
+1. Thread Safety: Add modification locks  
+2. Resizing: Dynamic bucket expansion  
+3. Memory: Pooled node allocation  
+4. Metrics: Add performance benchmarks  
