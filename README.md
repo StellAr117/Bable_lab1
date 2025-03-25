@@ -161,10 +161,3 @@ class MonoidHashMap(HashMap):
 | Unit      | Core functionality| API validation     |
 | PBT       | Robustness        | Filter invariants  |
 | Integration| Module interaction| (Not used)         |
-
-### Improvements
-
-1. Thread Safety: Add modification locks  
-2. Resizing: Dynamic bucket expansion  
-3. Memory: Pooled node allocation  
-4. Metrics: Add performance benchmarks  
