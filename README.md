@@ -10,17 +10,9 @@ demonstrate hash table implementation and algebraic structures.
 
 ### Code Files
 
-- `hash.py`Contains `HashMap` and `MonoidHashMap` implementations with:  
-  - Insertion order preservation (`to_builtin_list`)  
-  - List serialization (`from_builtin_list`, `to_builtin_list`)  
-  - Data transformations (`filter_by_predicate`, `map_by_function`)  
-  - Monoid operations (`empty`, `concat`, `reduce_process_elements`)  
+- `hash.py`Contains `HashMap` and `MonoidHashMap`
 
-- `test_hashmap.py`Comprehensive test suite including:  
-  - Unit tests for core functionality  
-  - Hypothesis-based property tests (PBT)  
-  - Order preservation verification  
-  - Collision handling validation  
+- `test_hashmap.py`Comprehensive test suite
 
 ---
 
