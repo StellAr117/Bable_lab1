@@ -1,33 +1,98 @@
-# GROUP-NAME - lab NUMBER - variant NUMBER
+# BABEL - Lab 1 - Variant 7
 
-This is an example project which demonstrates project structure and necessary
-CI checks. It is not the best structure for real-world projects, but good
-enough for educational purposes.
+This project implements a hash map using separate chaining collision resolution and extends it with monoid operations. Designed for educational purposes to demonstrate hash table implementation and algebraic structures.
 
-## Project structure
+---
 
-- `foo.py` -- implementation of `Foo` class with `hello` and `add` features.
-   Stateless.
-- `foo_test.py` -- unit and PBT tests for `Foo`.
+## Project Structure
 
-## Features
+### Code Files
+- `hash.py`  
+  Contains `HashMap` and `MonoidHashMap` implementations with:
+  - Key-value operations: `add`, `get`, `remove`
+  - Insertion order preservation (`to_builtin_list`)
+  - List serialization (`from_builtin_list`, `to_builtin_list`)
+  - Data transformations (`filter_by_predicate`, `map_by_function`)
+  - Monoid operations (`empty`, `concat`, `reduce_process_elements`)
 
-- PBT: `test_add_commutative`
+- `test_hashmap.py`  
+  Comprehensive test suite including:
+  - Unit tests for core functionality
+  - Hypothesis-based property tests (PBT)
+  - Order preservation verification
+  - Collision handling validation
 
-## Contribution
+---
 
-- Aleksandr Penskoi (EMAIL) -- template.
-- He Jian --all work
+## Core Features
+
+### Hash Map Implementation
+- **Separate Chaining**: Dynamic collision resolution using bucket lists
+- **Key Uniqueness**: Ensures unique keys with value overwriting
+- **Order Preservation**: Maintains insertion order for deterministic iteration
+
+### Monoid Operations
+- **Identity Element**: `MonoidHashMap.empty()` returns neutral element
+- **Associative Merge**: `concat()` combines maps with last-write semantics
+- **Data Processing**:
+  ```python
+  # Value transformation
+  new_map = original.map_by_function(lambda x: x*2)
+  
+  # Aggregation
+  total = original.reduce_process_elements(lambda a,b: a+b)
+---
+
+## Contributors
+
+| Contributor          | Contact               | Contributions                    |
+|----------------------|---------------------- |----------------------------------|
+| He Jian              | [hj66216084@gmail.com]| Core implementation & testing    |
+| Aleksandr Penskoi    | penskoi@example.com   | Project template design          |
+
+---
 
 ## Changelog
 
-- 29.03.2022 - 2
-  - Add  HashDictionary.py
-- 29.03.2022 - 1
-  - Update README. Add formal sections.
-- 29.03.2022 - 0
-  - Initial
+### 2025-3-22
+#### Added
+- Complete `HashDictionary` implementation
+- Monoid operations extension
 
-## Design notes
+#### Changed
+- Optimized collision handling performance
+- Improved insertion order tracking
 
-- ...
+### 2025-3-23
+#### Added
+- Property-based testing suite
+
+### 2025-3-25
+- Initial project scaffolding
+- Basic README structure
+
+---
+
+## Design Notes
+
+### Hash Table Implementation
+```python
+class HashMap:
+    def __init__(self):
+        self.bucket_size = 10  # Fixed bucket count
+        self.buckets = [None] * self.bucket_size
+        self.keys_order = []  # Insertion order tracking
+```
+
+### Hash Table Implementation
+```python
+class MonoidHashMap(HashMap):
+    @classmethod
+    def empty(cls):
+        """Identity element for monoid operations"""
+        return cls()
+    
+    def concat(self, other):
+        """Merge operation with last-write semantics"""
+        for key in other.keys_order:
+            self.add(key, other.get(key))
